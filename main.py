@@ -29,17 +29,21 @@ app = FastAPI()
 
 
 ESTILOS_RESPOSTA = {
-    "clara": """
-Use uma linguagem clara, acolhedora e conversacional.
-Explique os termos mais difíceis de maneira simples.
+    "pessoal": """
+Use uma linguagem clara, acolhedora e natural.
+Responda de forma direta e útil.
+Não inclua citações, fontes, páginas, nomes de arquivos ou referências bibliográficas.
 """,
-    "teologica": """
-Use uma linguagem teológica, com atenção a doutrina, fé e interpretação bíblica.
-Defina termos teológicos somente quando houver base nos documentos.
+    "profissional": """
+Use uma linguagem profissional, objetiva e organizada.
+Priorize clareza, aplicação prática e informações relevantes para trabalho,
+carreira, negócios ou documentos corporativos.
+Use as referências dos documentos consultados quando forem relevantes.
 """,
     "academica": """
 Use uma linguagem acadêmica, organizada e analítica.
 Apresente distinções, limites e nuances com precisão.
+Use as referências dos documentos consultados para apoiar as afirmações.
 """,
 }
 
@@ -219,8 +223,8 @@ def pagina(mensagem="", conteudo="", resposta=""):
                 <label for="estilo">Como você prefere a resposta?</label>
                 <br>
                 <select name="estilo" id="estilo">
-                    <option value="clara" selected>Clara e acolhedora</option>
-                    <option value="teologica">Teológica</option>
+                    <option value="pessoal" selected>Pessoal</option>
+                    <option value="profissional">Profissional</option>
                     <option value="academica">Acadêmica</option>
                 </select>
                 <br>
@@ -346,7 +350,7 @@ async def remover_documento(nome: str = Form(...)):
 @app.post("/perguntar", response_class=HTMLResponse)
 async def perguntar(
     pergunta: str = Form(...),
-    estilo: str = Form("clara"),
+    estilo: str = Form("pessoal"),
 ):
     if not os.getenv("OPENAI_API_KEY"):
         return pagina(
@@ -381,8 +385,21 @@ async def perguntar(
 
     instrucao_estilo = ESTILOS_RESPOSTA.get(
         estilo,
-        ESTILOS_RESPOSTA["clara"],
+        ESTILOS_RESPOSTA["pessoal"],
     )
+
+    if estilo == "pessoal":
+        regras_referencias = """
+No modo Pessoal, não mencione referências, arquivos, fontes, páginas,
+citações ou bibliografia. Responda somente ao que foi perguntado.
+"""
+    else:
+        regras_referencias = """
+Para cada afirmação importante, indique a referência fornecida no trecho:
+- Em PDFs, cite no formato: (nome do documento, página X).
+- Em Word ou texto simples, cite apenas o nome do documento.
+- Nunca invente uma página ou uma referência.
+"""
 
     prompt = f"""
 Você é um assistente de consulta de documentos.
@@ -391,10 +408,7 @@ Use exclusivamente os trechos recuperados abaixo.
 Não use conhecimento externo, suposições ou informações que não estejam
 claramente apoiadas pelos documentos.
 
-Para cada afirmação importante, indique a referência fornecida no trecho:
-- Em PDFs, cite no formato: (nome do documento, página X).
-- Em Word ou texto simples, cite apenas o nome do documento.
-- Nunca invente uma página ou uma referência.
+{regras_referencias}
 
 Regras de fidelidade:
 - Só diga que uma ideia está presente nos dois documentos quando houver apoio claro nos dois.
@@ -430,12 +444,14 @@ PERGUNTA:
             "Confira a conexão e tente novamente."
         )
 
+    referencias = "" if estilo == "pessoal" else referencias_html(trechos)
+
     resposta = (
         "<div class='conteudo'><h2>Pergunta</h2>"
         f"{html.escape(pergunta)}</div>"
         "<div class='resposta'><h2>Resposta</h2>"
         f"{html.escape(texto_resposta)}</div>"
-        f"{referencias_html(trechos)}"
+        f"{referencias}"
     )
 
     return pagina(resposta=resposta)
