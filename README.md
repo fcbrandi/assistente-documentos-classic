@@ -1,122 +1,131 @@
 # Assistente de Documentos
 
-Aplicação web inteligente para processar, organizar e consultar documentos digitais com apoio da API da OpenAI.
+Aplicação web para leitura, organização e consulta de documentos com apoio da inteligência artificial.
 
-## Descrição geral do projeto
+O sistema permite enviar documentos, extrair seus conteúdos, organizar informações importantes e realizar consultas sobre os arquivos processados.
 
-O Assistente de Documentos permite que usuários enviem arquivos, principalmente em PDF e DOCX, para leitura e análise. O conteúdo é processado, organizado em um índice documental e disponibilizado para consulta pela interface web.
+## Visão geral
 
-O objetivo é reduzir o tempo gasto na leitura manual de documentos e facilitar a localização de informações relevantes.
+O Assistente de Documentos foi desenvolvido para centralizar documentos digitais em uma interface web simples. A aplicação utiliza a API da OpenAI para apoiar a interpretação dos conteúdos e mantém um índice com informações dos documentos enviados.
+
+O projeto está publicado na Oracle Cloud Infrastructure (OCI) e pode ser acessado pelo navegador.
 
 ## Arquitetura da solução
 
-```mermaid
-flowchart LR
-    U[Usuário] --> W[Interface Web]
-    W --> A[FastAPI]
-    A --> P[Processamento de documentos]
-    P --> O[OpenAI API]
-    P --> I[Índice documental]
-    A --> N[Nginx]
-    N --> U
-Fluxo da aplicação
-O usuário envia documentos pela interface web.
-A aplicação lê arquivos PDF e DOCX.
-O conteúdo é processado e organizado em um índice documental.
-A API da OpenAI auxilia na interpretação das informações.
-O usuário realiza consultas sobre os documentos processados.
-A aplicação é publicada em uma VM Ubuntu na Oracle Cloud Infrastructure.
-Tecnologias e ferramentas utilizadas
-Categoria	Tecnologias
-Linguagem	Python
-Framework web	FastAPI
-Servidor da aplicação	Uvicorn
-Inteligência artificial	OpenAI API
-Processamento de PDF	PyPDF
-Processamento de Word	python-docx
-Configuração	python-dotenv
-Infraestrutura	Oracle Cloud Infrastructure
-Proxy reverso	Nginx
-Versionamento	Git e GitHub
-Desenvolvimento remoto	Visual Studio Code Remote SSH
+A solução é composta por quatro partes principais:
 
+- **Interface web:** local onde o usuário envia documentos e realiza consultas.
+- **Aplicação FastAPI:** recebe as solicitações, processa arquivos e devolve as respostas.
+- **API da OpenAI:** auxilia na análise e interpretação do conteúdo textual.
+- **Servidor OCI com Nginx:** mantém a aplicação disponível pela internet.
 
-Estrutura do projeto
-assistente-documentos/
-├── main.py          # Aplicação web FastAPI
-├── documentos.py    # Leitura e processamento de documentos
-├── indice.py        # Índice e consultas documentais
-├── config.py        # Configurações do projeto
-├── README.md        # Documentação
-└── .gitignore       # Arquivos não versionados
-Instruções para executar o projeto
-Pré-requisitos
-Python 3.10 ou superior
-Chave válida da OpenAI API
-Git
-Clonar o repositório
-git clone URL_DO_REPOSITORIO
+Fluxo básico:
+
+1. O usuário envia um documento pela interface.
+2. A aplicação lê e extrai o conteúdo do arquivo.
+3. As informações são organizadas no índice documental.
+4. A API da OpenAI apoia a análise quando necessário.
+5. O sistema apresenta a resposta ou os dados encontrados ao usuário.
+
+## Tecnologias e ferramentas
+
+- Python
+- FastAPI
+- Uvicorn
+- OpenAI API
+- PyPDF
+- python-docx
+- python-dotenv
+- Nginx
+- Oracle Cloud Infrastructure (OCI)
+- Git e GitHub
+- Visual Studio Code
+
+## Como executar o projeto localmente
+
+Clone o repositório:
+
+```bash
+git clone URL_DO_SEU_REPOSITORIO
 cd assistente-documentos
-Criar ambiente virtual
+```
+
+Crie e ative o ambiente virtual:
+
+```bash
 python3 -m venv .venv
 source .venv/bin/activate
-No Windows:
-.venv\Scripts\Activate.ps1
-Instalar dependências
-pip install fastapi "uvicorn[standard]" openai pypdf python-docx python-dotenv python-multipart
-Configurar a chave da OpenAI
-Crie o arquivo .env.local na raiz do projeto:
-OPENAI_API_KEY=sua_chave_aqui
-Nunca envie o arquivo .env.local ao GitHub.
+```
 
-Iniciar a aplicação
+Instale as dependências:
+
+```bash
+pip install fastapi "uvicorn[standard]" openai pypdf python-docx python-dotenv python-multipart
+```
+
+Crie o arquivo `.env.local` e informe sua chave:
+
+```text
+OPENAI_API_KEY=sua_chave_aqui
+```
+
+Inicie a aplicação:
+
+```bash
 uvicorn main:app --host 127.0.0.1 --port 8000
-Acesse:
-http://137.131.250.22
-Exemplos de perguntas que o assistente consegue responder
-Quais documentos foram processados?
-Quais arquivos foram enviados recentemente?
-Existe algum documento relacionado a uma empresa específica?
-Resuma o conteúdo deste documento.
-Quais informações foram encontradas neste arquivo?
-Quais documentos precisam de revisão?
-Localize documentos que mencionam determinado assunto.
-Quais arquivos estão disponíveis para consulta?
-Exemplos de respostas geradas pelo assistente
-Exemplo 1
-Pergunta: Quais documentos foram processados?
-Resposta: Foram encontrados documentos processados no índice documental. Os arquivos estão disponíveis para consulta individual pela aplicação.
-Exemplo 2
-Pergunta: Resuma o conteúdo deste documento.
-Resposta: O documento apresenta informações relevantes extraídas do arquivo, como datas, nomes, identificações e outros dados textuais encontrados durante o processamento.
-Exemplo 3
-Pergunta: Existem documentos relacionados à empresa XYZ?
-Resposta: Sim. Foram encontrados documentos que mencionam a empresa XYZ. A aplicação pode apresentar os arquivos relacionados para consulta.
-Exemplo 4
-Pergunta: Quais documentos precisam de revisão?
-Resposta: Documentos com informações incompletas ou baixa confiança na extração devem ser revisados manualmente antes de qualquer utilização definitiva.
-Implantação na OCI
-A aplicação é executada em uma VM Ubuntu na Oracle Cloud Infrastructure.
-A implantação utiliza:
-Uvicorn para executar a aplicação FastAPI;
-Nginx como proxy reverso na porta HTTP;
-uma chave da OpenAI armazenada somente no servidor;
-GitHub para versionamento e atualização do código.
-Para atualizar a aplicação após uma alteração enviada ao GitHub:
+```
+
+Abra no navegador:
+
+```text
+http://127.0.0.1:8000
+```
+
+## Como atualizar a versão publicada na OCI
+
+Depois de enviar as mudanças ao GitHub, conecte-se à máquina OCI e execute:
+
+```bash
 cd /home/ubuntu/assistente-documentos
 git pull origin main
 sudo systemctl restart assistente-documentos
-Segurança
-Os seguintes itens não são enviados ao GitHub:
-.env.local
-.venv/
-uploads/
-arquivos temporários
-índices gerados a partir dos documentos
-Status do projeto
-✅ Aplicação publicada na Oracle Cloud Infrastructure
-✅ Processamento de documentos com IA
-✅ Consulta de documentos indexados
-✅ Versionamento com Git e GitHub
-✅ Proteção de chaves e dados sensíveis
-Projeto desenvolvido com Python, FastAPI, Oracle Cloud Infrastructure e OpenAI API.
+```
+
+## Exemplos de perguntas que o assistente pode responder
+
+- Quais documentos foram processados?
+- Resuma o conteúdo deste documento.
+- Existem documentos relacionados a uma empresa específica?
+- Quais arquivos contêm determinada palavra ou assunto?
+- Quais documentos precisam de revisão?
+- Quais informações principais aparecem neste arquivo?
+
+## Exemplos de respostas geradas
+
+**Pergunta:** Quais documentos foram processados?
+
+**Resposta:** Foram identificados documentos PDF e DOCX no sistema. Os arquivos disponíveis podem ser consultados pela interface.
+
+**Pergunta:** Resuma este documento.
+
+**Resposta:** O documento apresenta as informações principais do arquivo, incluindo tema, dados relevantes e pontos que exigem atenção.
+
+**Pergunta:** Existem documentos relacionados à empresa XYZ?
+
+**Resposta:** Foram encontrados documentos com referências à empresa XYZ. A consulta pode indicar os arquivos e os trechos relacionados.
+
+## Segurança
+
+Informações sensíveis não devem ser enviadas ao repositório:
+
+- Chave da API da OpenAI
+- Arquivo `.env.local`
+- Arquivos enviados pelos usuários
+- Índices gerados localmente
+- Ambiente virtual `.venv`
+
+Esses itens estão protegidos pelo arquivo `.gitignore`.
+
+## Status do projeto
+
+O Assistente de Documentos está publicado na OCI, integrado à API da OpenAI e versionado em repositório privado no GitHub.
