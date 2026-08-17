@@ -129,3 +129,7 @@ Esses itens estão protegidos pelo arquivo `.gitignore`.
 ## Status do projeto
 
 O Assistente de Documentos está publicado na OCI, integrado à API da OpenAI e versionado em repositório privado no GitHub.
+
+## Link do projeto
+
+http://137.131.250.22
